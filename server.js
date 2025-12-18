@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // URL de ton Google Apps Script
-const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/noyer.io/s/AKfycbwLeLg_tcGur25zbIupBbaS2qwq672gTZqLYGXAit5ICnSUWzWGoNX65wj0xg8-CeT0tg/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypE3EuIjRLdjfFoC1-JonGZyx10UyZLqNzkxUsllX8D7lw_Th2lO9X9oJtCit_KqOHKw/exec";
 
 // stockage simple (prod → Redis / DB)
 const links = new Map();
