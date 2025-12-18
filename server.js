@@ -4,8 +4,11 @@ const jwt = require("jsonwebtoken");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ⚠️ Sur Render, mets cette variable dans les Environment Variables
+// 🔑 variable d'environnement Render
 const SECRET_KEY = process.env.SECRET_KEY || "dev-secret";
+
+// ✅ IMPORTANT pour Render (proxy HTTPS)
+app.set("trust proxy", 1);
 
 // Route pour générer un lien valide 10 minutes
 app.get("/generate-link", (req, res) => {
@@ -15,8 +18,8 @@ app.get("/generate-link", (req, res) => {
     { expiresIn: "10m" }
   );
 
-  const link = `${req.protocol}://${req.get("host")}/access?token=${token}`;
-  res.send({ link });
+  const link = `https://${req.get("host")}/access?token=${token}`;
+  res.json({ link });
 });
 
 // Route d'accès via le lien temporaire
@@ -29,9 +32,11 @@ app.get("/access", (req, res) => {
 
   try {
     const decoded = jwt.verify(token, SECRET_KEY);
-    res.redirect(decoded.redirect);
+
+    // 🔁 redirection explicite
+    return res.redirect(302, decoded.redirect);
   } catch (err) {
-    res.status(403).send("⛔ Lien expiré ou invalide");
+    return res.status(403).send("⛔ Lien expiré ou invalide");
   }
 });
 
