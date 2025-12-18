@@ -19,6 +19,8 @@ function shortId(length = 6) {
 
 // Générer un lien (10 minutes)
 app.get("/generate-link", (req, res) => {
+  console.log(">>> Génération de lien pour:", req.query.email);
+  
   const email = req.query.email;
   
   if (!email) {
@@ -34,6 +36,8 @@ app.get("/generate-link", (req, res) => {
     email: email
   });
 
+  console.log(">>> Lien créé:", id);
+
   res.json({
     link: `https://${req.get("host")}/go/${id}`
   });
@@ -41,26 +45,32 @@ app.get("/generate-link", (req, res) => {
 
 // Accès au lien
 app.get("/go/:id", async (req, res) => {
+  console.log(">>> Clic sur lien:", req.params.id);
+  
   const link = links.get(req.params.id);
 
   if (!link) {
+    console.log(">>> Lien invalide");
     return res.status(404).send("Lien invalide");
   }
 
   if (Date.now() > link.expiresAt) {
+    console.log(">>> Lien expiré");
     links.delete(req.params.id);
     return res.status(410).send("Lien expiré");
   }
 
   if (link.opened) {
+    console.log(">>> Lien déjà utilisé");
     return res.status(410).send("Lien déjà utilisé");
   }
 
   link.opened = true;
+  console.log(">>> Envoi à Google Sheets pour:", link.email);
 
   // Envoyer la mise à jour à Google Sheets
   try {
-    await fetch(GOOGLE_SCRIPT_URL, {
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -68,8 +78,9 @@ app.get("/go/:id", async (req, res) => {
         checkpoint: 1
       })
     });
+    console.log(">>> Réponse Google Sheets:", response.status);
   } catch (err) {
-    console.error("Erreur update Google Sheets:", err);
+    console.error(">>> Erreur Google Sheets:", err);
   }
 
   res.redirect(302, link.redirect);
