@@ -1,0 +1,13 @@
+{
+  "name": "lien-expirant",
+  "version": "1.0.0",
+  "description": "Lien web expirant après 10 minutes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
