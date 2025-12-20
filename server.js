@@ -17,11 +17,12 @@ function shortId(length = 6) {
     .slice(0, length);
 }
 
-// Générer un lien (10 minutes)
+// Générer un lien (durée personnalisable)
 app.get("/generate-link", (req, res) => {
   console.log(">>> Génération de lien pour:", req.query.email);
   
   const email = req.query.email;
+  const duration = parseInt(req.query.duration) || 10; // Durée en minutes, défaut 10 min
   
   if (!email) {
     return res.status(400).json({ error: "Email requis" });
@@ -31,12 +32,12 @@ app.get("/generate-link", (req, res) => {
 
   links.set(id, {
     redirect: "https://noyer.io",
-    expiresAt: Date.now() + 10 * 60 * 1000,
+    expiresAt: Date.now() + duration * 60 * 1000,
     opened: false,
     email: email
   });
 
-  console.log(">>> Lien créé:", id);
+  console.log(">>> Lien créé:", id, "- Durée:", duration, "minutes");
 
   res.json({
     link: `https://${req.get("host")}/go/${id}`
